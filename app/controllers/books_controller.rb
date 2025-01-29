@@ -3,7 +3,7 @@ class BooksController < ApplicationController
 
   # GET /books
   def index
-    @books = Book.all.order(rating: :desc, publication_date: :desc)
+    @books = Book.includes(:author).order(rating: :desc, publication_date: :desc)
     @books = @books.map do |book|
       { id:book.id, title: book.title, author_name: book.author.name }
     end
@@ -43,12 +43,12 @@ class BooksController < ApplicationController
 
   # Report books
   def generate_report
-    books = Book.all
+    books = Book.includes(:author)
     report = []
 
     books.each do |book|
       author = book.author
-      total_books = author.books.count
+      total_books = author.books_count
       highest_rated_book = author.books.order(rating: :desc).first
       published_last_year = author.books.where('publication_date >= ?', 1.year.ago).count
 
@@ -69,7 +69,7 @@ class BooksController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_book
-      @book = Book.find(params.expect(:id))
+      @book = Book.includes(:author).find(params.expect(:id))
     end
 
     # Only allow a list of trusted parameters through.

@@ -1,5 +1,5 @@
 class Book < ApplicationRecord
-  belongs_to :author
+  belongs_to :author, counter_cache: true
 
   validates :title, presence: true
   validates :publication_date, presence: true
@@ -9,6 +9,14 @@ class Book < ApplicationRecord
 
   STATUSES = %w[available checked_out reserved].freeze
   validates :status, inclusion: { in: STATUSES, message: "is not a valid status" }
+
+  def available_to_reserve?
+    status.to_sym == :available
+  end
+
+  def reserve!(email:)
+    update(status: :reserved, reservation_email: email)
+  end
 
   private
 

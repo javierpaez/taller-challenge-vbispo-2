@@ -51,5 +51,12 @@ RSpec.describe Book, type: :model do
       expect(book).not_to be_valid
       expect(book.errors[:status]).to include("is not a valid status")
     end
+
+    it "allows to reserve" do
+      book = Book.create!(title: "Test Book", author_id: author.id, publication_date: Date.today, status: "available")
+      book.status = "reserved"
+      book.reservation_email = "john@doe.com"
+      expect(book.save).to be true
+    end
   end
 end
